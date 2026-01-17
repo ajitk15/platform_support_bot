@@ -1,59 +1,97 @@
 # Platform Support Bot
 
-This guide details how to set up and run the Platform RCA Agent using `uv` and `python` on Windows.
+A specialized agent for diagnosing platform issues using **LangChain**, **FastMCP**, and LLMs.
 
-## Prerequisites
+## Overview
+The **Platform Support Bot** is an intelligent orchestrator that routes user queries to specialized agents for different platforms. It uses a modular architecture with LangGraph to manage state and workflow.
 
+### Supported Platforms
+- **IBM MQ**: Diagnostics via `dspmq`, `runmqsc` and Splunk logs.
+- **Splunk**: Log analysis and search.
+- **Redis**: Cache status and log inspection.
+- **ACE** (IBM App Connect Enterprise): Integration server checks.
+- **Apigee**: API Gateway monitoring.
+
+## Project Structure
+The codebase follows a modular design under the `src/` directory:
+
+```
+platform_rca_agent/
+├── src/
+│   ├── modules/
+│   │   ├── connections.py   # MCP Connection Manager
+│   │   ├── router.py        # Intelligent Query Router
+│   │   ├── graph.py         # LangGraph Construction
+│   │   └── state.py         # Agent State Definition
+│   └── platforms/           # Domain Agents
+│       ├── mq.py
+│       ├── splunk.py
+│       ├── redis.py
+│       ├── ace.py
+│       ├── apigee.py
+│       └── general.py
+├── mcpservers/             # Local MCP Server Implementations
+├── main_orchestrator.py    # Application Entry Point
+├── pyproject.toml          # Project Configuration
+└── uv.lock                 # Dependency Lockfile
+```
+
+## Setup & Installation
+
+### Prerequisites
 - **Python 3.11+**
-- **uv**: A fast Python package installer and resolver.
+- **uv** (Package Manager)
   - Install via PowerShell: `powershell -c "irm https://astral.sh/uv/install.ps1 | iex"`
   - Or via pip: `pip install uv`
 
-## Installation Steps
-
-1.  **Navigate to the repository**
-    Open your terminal in the project root.
-
-2.  **Initialize Virtual Environment**
-    Create a new virtual environment using `uv`:
+### Installation
+1.  **Clone the repository** and navigate to the root directory.
+2.  **Initialize Virtual Environment**:
     ```powershell
     uv venv
     ```
-
-3.  **Activate Virtual Environment**
-    ```powershell
-    .venv\Scripts\activate
-    ```
-
-4.  **Install Dependencies**
-    Sync dependencies from `uv.lock`:
+3.  **Install Dependencies**:
     ```powershell
     uv sync
     ```
-    *Note: This command installs all dependencies defined in `pyproject.toml` and locked in `uv.lock`.*
+    *(This installs all dependencies from `uv.lock` / `pyproject.toml`)*
 
 ## Configuration
 
-1.  **Environment Variables**
-    Ensure a `.env` file exists in the root directory. It should contain the following keys:
-    - `GOOGLE_API_KEY` (for Gemini) or `OPENAI_API_KEY` (for OpenAI)
-    - `LLM_CONNECTION` (set to `gemini` or `openai`, defaults to `gemini`)
-    - Splunk Configuration: `SPLUNK_HOST`, `SPLUNK_PORT`, `SPLUNK_USERNAME`, `SPLUNK_PASSWORD`
-    
-    *Note: A `.env` file is present in the workspace. Verify its contents.*
+Create a `.env` file in the root directory with the following variables:
+
+```ini
+# LLM Provider (gemini or openai)
+LLM_CONNECTION=gemini
+GOOGLE_API_KEY=your_google_api_key_here
+# OR
+# LLM_CONNECTION=openai
+# OPENAI_API_KEY=your_openai_api_key_here
+
+# Splunk Configuration (Required for Splunk agent)
+SPLUNK_HOST=localhost
+SPLUNK_PORT=8089
+SPLUNK_USERNAME=admin
+SPLUNK_PASSWORD=changeme
+SPLUNK_SCHEME=https
+```
 
 ## Running the Application
 
-To start the agent orchestrator:
+Start the bot using the `uv` run command or the virtual environment python directly:
 
 ```powershell
-# Option 1: Using the activated virtual environment
-python main_orchestrator.py
-
-# Option 2: Using uv run (handles venv automatically)
+# Option 1: UV Run
 uv run main_orchestrator.py
+
+# Option 2: Active Venv
+.venv\Scripts\activate
+python main_orchestrator.py
 ```
 
-### Troubleshooting
-- **Entry Point Mismatch**: The `pyproject.toml` lists `platform-rca-agent = "main:main"`, but the main file is `main_orchestrator.py`. Do not try to run `platform-rca-agent` directly unless you rename the file. Use the commands above.
-- **MCP Servers**: The application expects `mcpservers/splunk_mcp.py` and `mcpservers/mqmcpserver.py` to be present.
+## Usage
+Once running, you can ask questions like:
+- "List all queue managers"
+- "Show me MQ errors in the last hour"
+- "Check Redis cache status"
+- "Help" (to see what I can do)
