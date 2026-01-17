@@ -1,0 +1,111 @@
+[project]
+name = "platform-support-bot"
+version = "0.3.0"
+description = "MQ RCA Agent using LangChain and FastMCP, MQ MCP, Splunk MCP"
+readme = "README.md"
+requires-python = ">=3.11"
+
+dependencies = [
+    # ---------- LangChain / LangGraph ----------
+    "langchain==0.3.7",
+    "langgraph==0.2.45",
+    "langchain-community==0.3.5",
+    "langchain-google-genai>=0.0.5",
+    "langchain-openai>=0.1.1",
+    # ---------- Google Gemini ----------
+    "google-generativeai==0.8.3",
+    # ---------- Vector DB ----------
+    "chromadb==0.5.23",
+    "langchain-chroma",
+    # ---------- MCP ----------
+    "mcp>=1.5.0",
+    "mcp[cli]>=1.5.0",
+    "fastmcp>=0.4.0",
+    "httpx>=0.28.0",
+    "httpx-sse>=0.4.0",
+    "anyio>=4.0.0",
+    "sse-starlette>=1.8.0",
+    # ---------- Web / API ----------
+    "fastapi>=0.104.0",
+    "uvicorn>=0.23.1",
+    "starlette>=0.27.0",
+    # ---------- Splunk ----------
+    "splunk-sdk>=2.0.0",
+    "xmltodict>=0.13.0",
+    # ---------- Async / HTTP ----------
+    "aiohttp>=3.11.0,<4.0.0",
+    "requests==2.32.3",
+    # ---------- Config / Validation ----------
+    "python-dotenv==1.0.1",
+    "python-decouple>=3.8",
+    "pydantic==2.9.2",
+    "pydantic-settings>=2.0.0",
+    "jsonschema>=4.19.0",
+    "pyyaml>=6.0.0",
+    # ---------- Data ----------
+    "pandas==2.2.3",
+    "numpy>=1.24.0,<2.0.0",
+    "matplotlib>=3.7.0",
+    "seaborn>=0.12.0",
+    # ---------- JSON / CLI ----------
+    "jq>=1.6.0",
+    "typer>=0.9.0",
+    "typing-extensions>=4.8.0",
+    # ---------- UI ----------
+    "streamlit>=1.28.0",
+    # ---------- Monitoring ----------
+    "loguru>=0.7.0",
+    "tenacity>=8.2.0",
+    # ---------- Jupyter ----------
+    "jupyter==1.1.1",
+    "notebook==7.2.2",
+    "ipykernel==6.29.5",
+    "ipywidgets>=8.0.0",
+    "langchain-core>=0.3.63",
+    "openai>=1.55.0",
+    "langchain-openai>=0.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.14.1",
+    "black>=25.1.0",
+    "isort>=6.0.0",
+    "mypy>=1.0.0",
+]
+
+[project.scripts]
+platform-support-bot = "main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+# ------------------ Tooling ------------------
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v"
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
