@@ -23,8 +23,13 @@ st.set_page_config(
 # Custom CSS for modern, compact UI (Light Theme)
 st.markdown("""
 <style>
-    /* Reduce top padding and hide header */
-    header { visibility: hidden; height: 0px !important; }
+    /* Reduce top padding and keep sidebar toggle accessible */
+    header[data-testid="stHeader"] {
+        background-color: transparent !important;
+    }
+    .stAppDeployButton, #MainMenu {
+        visibility: hidden;
+    }
     .block-container {
         padding-top: 1.5rem !important;
         padding-bottom: 2rem !important;
@@ -51,43 +56,62 @@ st.markdown("""
         margin-bottom: 1rem;
     }
     
-    /* Chat message styling */
-    .chat-message {
-        padding: 1rem;
-        border-radius: 12px;
-        margin-bottom: 1rem;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    /* Compact Chat message styling */
+    .chat-row {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 0.75rem;
         animation: fadeIn 0.3s ease-in;
+    }
+    
+    .chat-bubble {
+        padding: 0.6rem 0.8rem;
+        border-radius: 12px;
+        max-width: 85%;
+        font-size: 0.95rem;
+        line-height: 1.4;
+        position: relative;
         border: 1px solid #e9ecef;
     }
     
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .user-message {
-        background-color: #ffffff;
-        border-left: 4px solid #3498db;
-        margin-left: 2rem;
-    }
-    
-    .bot-message {
-        background-color: #f1f4f9;
-        border-left: 4px solid #9b59b6;
-        margin-right: 2rem;
-    }
-    
-    /* Platform badge styling */
-    .platform-badge {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.85rem;
+    .message-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+        font-size: 0.8rem;
         font-weight: 600;
-        margin-bottom: 0.5rem;
-        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-        color: white;
+    }
+    
+    .user-row {
+        align-items: flex-end;
+    }
+    
+    .user-bubble {
+        background-color: #ffffff;
+        border-right: 3px solid #3498db;
+        color: #2c3e50;
+    }
+    
+    .bot-row {
+        align-items: flex-start;
+    }
+    
+    .bot-bubble {
+        background-color: #f8fbff;
+        border-left: 3px solid #9b59b6;
+        color: #2c3e50;
+    }
+    
+    .platform-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        background: #eef2f7;
+        color: #5a6b7d;
+        border: 1px solid #d1d9e6;
     }
     
     /* Input box styling */
@@ -265,9 +289,21 @@ else:
         for m in st.session_state.messages:
             role, content, p = m["role"], m["content"], m.get("platform", "General")
             if role == "user":
-                st.markdown(f'<div class="chat-message user-message"><div style="color: #3498db; font-weight: 600;">👤 You</div><div>{content}</div></div>', unsafe_allow_html=True)
+                st.markdown(f'''
+                    <div class="chat-row user-row">
+                        <div class="message-header" style="color: #3498db;">👤 YOU</div>
+                        <div class="chat-bubble user-bubble">{content}</div>
+                    </div>
+                ''', unsafe_allow_html=True)
             else:
-                st.markdown(f'<div class="chat-message bot-message"><div style="color: #9b59b6; font-weight: 600;">🤖 Assistant <span class="platform-badge">{PLATFORMS[p]["icon"]} {p}</span></div><div>{content}</div></div>', unsafe_allow_html=True)
+                st.markdown(f'''
+                    <div class="chat-row bot-row">
+                        <div class="message-header" style="color: #9b59b6;">
+                            🤖 ASSISTANT <span class="platform-badge">{PLATFORMS[p]["icon"]} {p}</span>
+                        </div>
+                        <div class="chat-bubble bot-bubble">{content}</div>
+                    </div>
+                ''', unsafe_allow_html=True)
 
     # Input area - chat_input is natively pinned to the bottom
     prompt = st.chat_input(f"Ask about {st.session_state.platform}...")
