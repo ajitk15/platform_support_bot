@@ -64,22 +64,56 @@ async def main():
         except Exception as e:
             print(f"[WARN] Graph visualization failed: {e}")
 
-        print("\nReady! (Type 'quit' to exit)")
+        # Platform Selection API
+        SUPPORTED_PLATFORMS = {
+            "1": "General",
+            "2": "MQ",
+            "3": "Splunk",
+            "4": "Redis",
+            "5": "ACE",
+            "6": "Apigee"
+        }
+
+        print("\nSelect Platform:")
+        for k, v in SUPPORTED_PLATFORMS.items():
+            print(f"  {k}. {v}")
+        
+        choice = await asyncio.to_thread(input, "\nEnter choice (1-6) [Default 1]: ")
+        selected_platform = SUPPORTED_PLATFORMS.get(choice.strip(), "General")
+        platform_hint = selected_platform.lower()
+
+        print(f"\n[INFO] Starting session for platform: {selected_platform}")
+        print("Ready! (Type 'quit' to exit, 'switch' to change platform)")
         print("-" * 60)
 
         while True:
             try:
-                user_input = await asyncio.to_thread(input, "User: ")
+                user_input = await asyncio.to_thread(input, f"[{selected_platform}] User: ")
                 user_input = user_input.strip()
+                
                 if user_input.lower() in ["quit", "exit"]:
                     break
+                
+                if user_input.lower() == "switch":
+                    print("\nSelect Platform:")
+                    for k, v in SUPPORTED_PLATFORMS.items():
+                        print(f"  {k}. {v}")
+                    choice = await asyncio.to_thread(input, "\nEnter choice (1-6): ")
+                    selected_platform = SUPPORTED_PLATFORMS.get(choice.strip(), "General")
+                    platform_hint = selected_platform.lower()
+                    print(f"\n[INFO] Switched to platform: {selected_platform}")
+                    continue
+
                 if not user_input:
                     continue
                 
                 print("Processing...")
                 
                 # Run Graph
-                inputs = {"messages": [HumanMessage(content=user_input)]}
+                inputs = {
+                    "messages": [HumanMessage(content=user_input)],
+                    "platform": platform_hint
+                }
                 
                 # Stream results
                 async for output in app.astream(inputs, stream_mode="values"):
