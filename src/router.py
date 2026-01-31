@@ -9,7 +9,9 @@ async def platform_router(state: AgentState, model):
     messages = state["messages"]
     last_user_msg = messages[-1].content
     
-    # Prompt for the router
+    # If platform is already specified (e.g. from UI selection), respect it
+    if state.get("platform") and state["platform"] != "General":
+        return {"platform": state["platform"]}
     router_prompt = (
         "You are an intelligent router. Your goal is to direct the user's query to the correct platform specialist.\n"
         "The available platforms are:\n"
