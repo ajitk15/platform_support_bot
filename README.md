@@ -52,11 +52,15 @@ Create a `.env` file in the root directory with your credentials:
 # LLM Provider (gemini or openai)
 LLM_CONNECTION=openai
 OPENAI_API_KEY=your_openai_api_key_here
-
+GOOGLE_API_KEY=your_openai_api_key_here
 # Splunk Configuration
 SPLUNK_HOST=localhost
 SPLUNK_PORT=8089
-...
+SPLUNK_USERNAME=your_user
+SPLUNK_PASSWORD=your_password
+SPLUNK_SCHEME=https
+VERIFY_SSL=false
+SPLUNK_URL=https://localhost:8089
 ```
 
 ## Running the Application
