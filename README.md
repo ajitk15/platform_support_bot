@@ -17,17 +17,27 @@ The **Platform Support Bot** is an intelligent orchestrator that routes user que
 platform_support_bot/
 ├── src/
 │   ├── connections.py       # MCP Connection Manager (Fault-Tolerant)
-│   ├── router.py            # Intelligent Query Router
-│   ├── graph.py             # LangGraph Construction
-│   ├── state.py             # Agent State Definition
-│   └── platforms/           # Domain Agents (mq.py, splunk.py, etc.)
+│   ├── graph.py             # LangGraph Construction Logic
+│   ├── router.py            # Intelligent Query Categorization
+│   ├── state.py             # LangGraph State Definitions
+│   └── platforms/           # Specialized Platform Agents
+│       ├── mq.py            # IBM MQ Agent
+│       ├── splunk.py        # Splunk Search Agent
+│       ├── redis.py         # Redis Diagnostic Agent
+│       ├── ace.py           # IBM ACE Agent
+│       └── apigee.py        # Apigee Gateway Agent
 ├── streamlit_app/           # Modern Web Interface
-│   ├── app.py               # Streamlit Frontend (High-Density UI)
-│   └── backend.py           # Backend Integration Layer
+│   ├── app.py               # Streamlit UI (Home + Chat)
+│   ├── backend.py           # Streamlit-to-Graph Bridge
+│   └── .streamlit/          # Streamlit Configuration (Theme/Port)
 ├── mcpservers/             # FastMCP Server Implementations
-├── main_orchestrator.py    # CLI Application Entry Point
-├── pyproject.toml          # Project Configuration
-└── uv.lock                 # Dependency Lockfile
+│   ├── mqmcpserver.py      # IBM MQ MCP Connector
+│   └── splunk_mcp.py       # Splunk MCP Connector
+├── main_orchestrator.py    # CLI Diagnostic Interface
+├── pyproject.toml          # Project Dependencies & UV Config
+├── uv.lock                 # Dependency Lockfile
+├── .env                    # Environment Credentials (LLM, Splunk, etc.)
+└── .gitignore              # Standard Python Git Exclusions
 ```
 
 ## Setup & Installation
